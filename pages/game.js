@@ -62,7 +62,7 @@ export default function Game({ seed, level }) {
 					{(isCorrect || guessCount === 6) && (
 						isCorrect ?
 							<>
-								<p>Let's try the next round!</p>
+								<p>Let&apos;s try the next round!</p>
 								<button onClick={handleNextLevel}>Level {+level + 1}</button>
 							</> :
 							<>
