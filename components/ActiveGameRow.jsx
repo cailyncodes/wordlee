@@ -29,9 +29,11 @@ export default function ActiveGameRow({ submitGuess }) {
 		}
 
 		document.addEventListener('keyup', listener);
+		document.addEventListener('touchend', listener);
 
 		return () => {
 			document.removeEventListener("keyup", listener);
+			document.removeEventListener("touchend", listener);
 		}
 	}, []);
 

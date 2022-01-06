@@ -4,16 +4,37 @@ import fs from "fs";
 import path from "path";
 import { shuffle } from "../../utils/random.js";
 
-function getStatus(letter, position, currentWord) {
-	if (currentWord[position - 1] === letter) {
-		return "correct";
+function getResponse(currentWord, guess) {
+	const statuses = ['pending', 'pending', 'pending', 'pending', 'pending'];
+	let lettersInWordAfterRemovingCorrect = currentWord.split("");
+	let numRemoved = 0;
+
+	for (let i = 0; i < currentWord.length; ++i) {
+		if (currentWord[i] === guess[i]) {
+			statuses[i] = 'correct';
+			lettersInWordAfterRemovingCorrect = lettersInWordAfterRemovingCorrect.filter((_,j) => i !== j + numRemoved);
+			++numRemoved;
+		}
+		if (!currentWord.includes(guess[i])) {
+			statuses[i] = 'not-used';
+		}
 	}
 
-	if (currentWord.includes(letter)) {
-		return "wrong-position";
+	for (let i = 0; i < currentWord.length; ++i) {
+		if (statuses[i] === "pending") {
+			if (lettersInWordAfterRemovingCorrect.includes(guess[i])) {
+				statuses[i] = "wrong-position";
+			}
+		}
 	}
 
-	return "not-used";
+	return [
+		{ letter: guess[0], status: statuses[0] },
+		{ letter: guess[1], status: statuses[1] },
+		{ letter: guess[2], status: statuses[2] },
+		{ letter: guess[3], status: statuses[3] },
+		{ letter: guess[4], status: statuses[4] },
+	]
 }
 
 export default function handler(req, res) {
@@ -28,11 +49,5 @@ export default function handler(req, res) {
 	const currentWord = sortedWords[level - 1]
 	const parsedGuess = guess.toUpperCase();
 
-  res.status(200).json([
-		{ letter: parsedGuess[0], status: getStatus(parsedGuess[0], 1, currentWord) },
-		{ letter: parsedGuess[1], status: getStatus(parsedGuess[1], 2, currentWord) },
-		{ letter: parsedGuess[2], status: getStatus(parsedGuess[2], 3, currentWord) },
-		{ letter: parsedGuess[3], status: getStatus(parsedGuess[3], 4, currentWord) },
-		{ letter: parsedGuess[4], status: getStatus(parsedGuess[4], 5, currentWord) },
-	]);
+  res.status(200).json(getResponse(currentWord, parsedGuess));
 }
