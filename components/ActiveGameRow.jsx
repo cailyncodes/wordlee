@@ -43,7 +43,8 @@ export default function ActiveGameRow({ submitGuess }) {
 		}
 	}, [submitting]);
 
-	return <div className={styles.container}>
+	return <div className={styles.container} onClick={() => document.getElementById("input").focus()}>
+		<input id="input" type="hidden" />
 		{input.split('').map((letter, i) => <GameTile key={`active-${i}`} letter={letter} status="pending" />)}
 	</div>
 }
