@@ -1,0 +1,28 @@
+.container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 35px;
+	width: 35px;
+	font-size: 1.5rem;
+	background-color: #ddeedd;
+	color: #121212;
+	border: solid black 1px;
+	text-align: center;
+}
+
+.pending {
+	background-color: inherit;
+}
+
+.correct {
+	background-color: #229944;
+}
+
+.wrong-position {
+	background-color: #ddcc11;
+}
+
+.not-used {
+	background-color: #883333;
+}

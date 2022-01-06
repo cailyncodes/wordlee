@@ -1,0 +1,28 @@
+.container {
+  padding: 0 1rem;
+}
+
+.main {
+  min-height: 100vh;
+  padding: 4rem 0;
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: repeat(3, min-content);
+  gap: 25px;
+}
+
+.title {
+  margin: 0;
+	font-size: 2.5rem;
+	justify-self: start;
+	text-align: center;
+	width: 100%;
+}
+
+.subtitle {
+  margin: 0;
+	font-size: 1.6rem;
+	justify-self: start;
+	text-align: center;
+	width: 100%;
+}
