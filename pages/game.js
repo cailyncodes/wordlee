@@ -57,6 +57,9 @@ export default function Game({ seed, level }) {
 				<h2 className={styles.subtitle}>Seed: {seed} | Level: {level}</h2>
 
 				<Board submitGuess={submitGuess} data={data} />
+				<div>
+					<input style={{ width: '100%' }} value="" placeholder="Tap here on mobile to bring up keyboard" />
+				</div>
 				<div style={{ display: "flex", width: "50%", margin: "0 auto", flexDirection: "column", alignItems: "center" }}>
 					{isCorrect && <p>Woo! You did it! Way to go!</p>}
 					{(isCorrect || guessCount === 6) && (
