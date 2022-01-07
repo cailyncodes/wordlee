@@ -1,6 +1,7 @@
 import styles from '../styles/components/GameRow.module.css';
 import GameTile from './GameTile';
 import { useState, useEffect } from 'react';
+import { normalizeInputEvent } from '../utils/events';
 
 export default function ActiveGameRow({ submitGuess }) {
 	const [input, setInput] = useState('     ');
@@ -10,6 +11,19 @@ export default function ActiveGameRow({ submitGuess }) {
 		const listener = (e) => {
 			setInput(i => {
 				const numOfLetters = i.trim().length;
+
+				if (e.ignore) {
+					return i;
+				}
+
+				if (e.data) {
+					e.key = e.data.toUpperCase();
+					e.keyCode = e.key.charCodeAt(0);
+				}
+
+				if (!e.key) {
+					return i;
+				}
 
 				if (e.key === "Enter") {
 					setSubmitting(true);
@@ -28,12 +42,14 @@ export default function ActiveGameRow({ submitGuess }) {
 			})
 		}
 
-		document.addEventListener('keyup', listener);
-		document.addEventListener('touchend', listener);
+		const l = e => listener(normalizeInputEvent(e));
+
+		document.addEventListener('keyup', l);
+		document.addEventListener('input', l);
 
 		return () => {
-			document.removeEventListener("keyup", listener);
-			document.removeEventListener("touchend", listener);
+			document.removeEventListener("keyup", l);
+			document.addEventListener('input', l);
 		}
 	}, []);
 

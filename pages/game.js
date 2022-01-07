@@ -13,6 +13,12 @@ export default function Game({ seed, level }) {
 	const [submitting, setSubmitting] = useState(false);
 	const [isCorrect, setIsCorrect] = useState(false);
 	const [guessCount, setGuessCount] = useState(0);
+	const [isMobile, setIsMobile] = useState(false);
+
+	useEffect(() => {
+		const isMobile = window.navigator.userAgent.toLowerCase().includes("android") || window.navigator.userAgent.toLowerCase().includes("iphone") || window.navigator.userAgent.toLowerCase().includes("ipod") || window.navigator.userAgent.toLowerCase().includes("ipad")
+		setIsMobile(isMobile)
+	}, []);
 
 	const submitGuess = async (guess) => {
 		setSubmitting(true)
@@ -39,7 +45,7 @@ export default function Game({ seed, level }) {
 		setData([]);
 		setGuessCount(0);
 		setIsCorrect(false);
-		cookies.set(seed, +level+1, { secure: true });
+		cookies.set(seed, +level+1, { secure: false });
 		router.reload();
 	}
 
@@ -57,9 +63,9 @@ export default function Game({ seed, level }) {
 				<h2 className={styles.subtitle}>Seed: {seed} | Level: {level}</h2>
 
 				<Board submitGuess={submitGuess} data={data} />
-				{/* <div>
+				{isMobile && <div>
 					<input style={{ width: '100%' }} value="" placeholder="Tap here on mobile to bring up keyboard" />
-				</div> */}
+				</div>}
 				<div style={{ display: "flex", width: "50%", margin: "0 auto", flexDirection: "column", alignItems: "center" }}>
 					{isCorrect && <p>Woo! You did it! Way to go!</p>}
 					{(isCorrect || guessCount === 6) && (
