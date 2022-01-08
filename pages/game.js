@@ -103,7 +103,7 @@ export default function Game({ seed, level }) {
 export function getServerSideProps(context) {
 	const { req: { cookies }, query: { seed } } = context;
 
-	const level = cookies[seed] || "1";
+	const level = cookies[seed.toLowerCase()] || "1";
 
 	if (!seed) {
 		return {
@@ -116,7 +116,7 @@ export function getServerSideProps(context) {
 
 	return {
 		props: {
-			seed,
+			seed: seed.toLowerCase(),
 			level,
 		}
 	}
