@@ -70,7 +70,7 @@ export default function Game({ seed, level }) {
 				<h2 className={styles.subtitle}>Seed: {seed} | Level: {level}</h2>
 				
 
-				{guessCount === 6 || timer === 0 ? (
+				{guessCount === 6 ? (
 					<div style={{ display: "flex", width: "50%", margin: "0 auto", flexDirection: "column", alignItems: "center" }}>
 						<p>Game over</p>
 						<h3>Final Score: {(level - 1)}</h3>
@@ -79,7 +79,7 @@ export default function Game({ seed, level }) {
 					</div>
 				) : (
 					<>
-						<h3 className={styles.subtitle}>Timer: {timer}</h3>
+						{/* <h3 className={styles.subtitle}>Timer: {timer}</h3> */}
 						<Board submitGuess={submitGuess} data={data} />
 						{isMobile && <div>
 							<input style={{ width: '100%' }} value="" placeholder="Tap here on mobile to bring up keyboard" />
