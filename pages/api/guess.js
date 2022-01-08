@@ -5,28 +5,56 @@ import path from "path";
 import { shuffle } from "../../utils/random.js";
 
 function getResponse(currentWord, guess) {
-	const statuses = ['pending', 'pending', 'pending', 'pending', 'pending'];
-	let lettersInWordAfterRemovingCorrect = currentWord.split("");
-	let numRemoved = 0;
+	const currentLetters = currentWord.split("");
+	const guessLetters = guess.split("");
 
-	for (let i = 0; i < currentWord.length; ++i) {
-		if (currentWord[i] === guess[i]) {
+	const remainingIndices = [];
+
+	const statuses = ['pending', 'pending', 'pending', 'pending', 'pending']; 
+
+	for (let i = 0; i < guessLetters.length; ++i) {
+		if (currentLetters[i] === guessLetters[i]) {
 			statuses[i] = 'correct';
-			lettersInWordAfterRemovingCorrect = lettersInWordAfterRemovingCorrect.filter((_,j) => i !== j + numRemoved);
-			++numRemoved;
-		}
-		if (!currentWord.includes(guess[i])) {
-			statuses[i] = 'not-used';
+			currentLetters[i] = '';
+		} else {
+			remainingIndices.push(i);
 		}
 	}
 
-	for (let i = 0; i < currentWord.length; ++i) {
-		if (statuses[i] === "pending") {
-			if (lettersInWordAfterRemovingCorrect.includes(guess[i])) {
-				statuses[i] = "wrong-position";
+	for (const i of remainingIndices) {
+		const index = currentLetters.indexOf(guessLetters[i]);
+		if (index >= 0) {
+			statuses[i] = 'wrong-position';
+			currentLetters[index] = '';
+		} else {
+			if (!currentWord.includes(guessLetters[i])) {
+				statuses[i] = 'not-used';
 			}
 		}
 	}
+
+
+	// let lettersInWordAfterRemovingCorrect = currentWord.split("");
+	// let numRemoved = 0;
+
+	// for (let i = 0; i < currentWord.length; ++i) {
+	// 	if (currentWord[i] === guess[i]) {
+	// 		statuses[i] = 'correct';
+	// 		lettersInWordAfterRemovingCorrect = lettersInWordAfterRemovingCorrect.filter((_,j) => i !== j + numRemoved);
+	// 		++numRemoved;
+	// 	}
+	// 	if (!currentWord.includes(guess[i])) {
+	// 		statuses[i] = 'not-used';
+	// 	}
+	// }
+
+	// for (let i = 0; i < currentWord.length; ++i) {
+	// 	if (statuses[i] === "pending") {
+	// 		if (lettersInWordAfterRemovingCorrect.includes(guess[i])) {
+	// 			statuses[i] = "wrong-position";
+	// 		}
+	// 	}
+	// }
 
 	return [
 		{ letter: guess[0], status: statuses[0] },

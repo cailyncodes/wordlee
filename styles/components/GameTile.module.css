@@ -16,13 +16,13 @@
 }
 
 .correct {
-	background-color: #229944;
+	background-color: #49df74;
 }
 
 .wrong-position {
-	background-color: #ddcc11;
+	background-color: #fff04e;
 }
 
 .not-used {
-	background-color: #883333;
+	background-color: #ff6060;
 }

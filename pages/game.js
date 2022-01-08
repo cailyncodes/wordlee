@@ -14,6 +14,7 @@ export default function Game({ seed, level }) {
 	const [isCorrect, setIsCorrect] = useState(false);
 	const [guessCount, setGuessCount] = useState(0);
 	const [isMobile, setIsMobile] = useState(false);
+	const [timer, setTimer] = useState(120);
 
 	useEffect(() => {
 		const isMobile = window.navigator.userAgent.toLowerCase().includes("android") || window.navigator.userAgent.toLowerCase().includes("iphone") || window.navigator.userAgent.toLowerCase().includes("ipod") || window.navigator.userAgent.toLowerCase().includes("ipad")
@@ -41,6 +42,12 @@ export default function Game({ seed, level }) {
 		}
 	}, [submitting]);
 
+	useEffect(() => {
+		if (timer > 0) {
+			setTimeout(() => setTimer(t => --t), 1000);
+		}
+	}, [timer]);
+
 	const handleNextLevel = () => {
 		setData([]);
 		setGuessCount(0);
@@ -61,25 +68,33 @@ export default function Game({ seed, level }) {
           Wordlee
         </h1>
 				<h2 className={styles.subtitle}>Seed: {seed} | Level: {level}</h2>
+				
 
-				<Board submitGuess={submitGuess} data={data} />
-				{isMobile && <div>
-					<input style={{ width: '100%' }} value="" placeholder="Tap here on mobile to bring up keyboard" />
-				</div>}
-				<div style={{ display: "flex", width: "50%", margin: "0 auto", flexDirection: "column", alignItems: "center" }}>
-					{isCorrect && <p>Woo! You did it! Way to go!</p>}
-					{(isCorrect || guessCount === 6) && (
-						isCorrect ?
-							<>
-								<p>Let&apos;s try the next round!</p>
-								<button onClick={handleNextLevel}>Level {+level + 1}</button>
-							</> :
-							<>
-								<p>Better luck next time! Try again with a different seed.</p>
-								<button onClick={() => router.push('/')}>Try again</button>
-							</>
-					)}
-				</div>
+				{guessCount === 6 || timer === 0 ? (
+					<div style={{ display: "flex", width: "50%", margin: "0 auto", flexDirection: "column", alignItems: "center" }}>
+						<p>Game over</p>
+						<h3>Final Score: {(level - 1)}</h3>
+						<p>Try again with a different seed.</p>
+						<button onClick={() => router.push('/')}>Restart</button>
+					</div>
+				) : (
+					<>
+						<h3 className={styles.subtitle}>Timer: {timer}</h3>
+						<Board submitGuess={submitGuess} data={data} />
+						{isMobile && <div>
+							<input style={{ width: '100%' }} value="" placeholder="Tap here on mobile to bring up keyboard" />
+						</div>}
+						<div style={{ display: "flex", width: "50%", margin: "0 auto", flexDirection: "column", alignItems: "center" }}>
+							{isCorrect && <p>Woo! You did it! Way to go!</p>}
+							{isCorrect &&
+								<>
+									<p>Let&apos;s try the next round!</p>
+									<button onClick={handleNextLevel}>Level {+level + 1}</button>
+								</> 
+							}
+						</div>
+					</>
+				)}
       </main>
     </div>
   )

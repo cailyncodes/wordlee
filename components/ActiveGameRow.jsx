@@ -26,7 +26,9 @@ export default function ActiveGameRow({ submitGuess }) {
 				}
 
 				if (e.key === "Enter") {
-					setSubmitting(true);
+					if (i.length === 5) {
+						setSubmitting(true);
+					}
 					return i;
 				}
 
