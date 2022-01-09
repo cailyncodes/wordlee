@@ -51,7 +51,7 @@ export default function ActiveGameRow({ submitGuess }) {
 
 		return () => {
 			document.removeEventListener("keyup", l);
-			document.addEventListener('input', l);
+			document.removeEventListener('input', l);
 		}
 	}, []);
 

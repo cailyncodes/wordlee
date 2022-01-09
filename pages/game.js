@@ -5,37 +5,56 @@ import Board from '../components/Board';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import cookies from 'cookie-cutter';
+import { MODES } from '../utils/modes';
 
-export default function Game({ seed, level }) {
+export default function Game({ seed, level, modeName }) {
 	const router = useRouter();
 	const [data, setData] = useState([]);
+	const [prevGuess, setPrevGuess] = useState("");
 	const [guess, setGuess] = useState("");
 	const [submitting, setSubmitting] = useState(false);
 	const [isCorrect, setIsCorrect] = useState(false);
 	const [guessCount, setGuessCount] = useState(0);
 	const [isMobile, setIsMobile] = useState(false);
-	const [timer, setTimer] = useState(120);
+	const mode = MODES[modeName];
+	const [timer, setTimer] = useState(mode.timePerLevel);
+	const [error, setError] = useState('');
+	
 
 	useEffect(() => {
-		const isMobile = window.navigator.userAgent.toLowerCase().includes("android") || window.navigator.userAgent.toLowerCase().includes("iphone") || window.navigator.userAgent.toLowerCase().includes("ipod") || window.navigator.userAgent.toLowerCase().includes("ipad")
+		const userAgent = window.navigator.userAgent.toLowerCase();
+		const isMobile = userAgent.includes("android")
+			|| userAgent.includes("iphone")
+			|| userAgent.includes("ipod")
+			|| userAgent.includes("ipad");
 		setIsMobile(isMobile)
 	}, []);
 
-	const submitGuess = async (guess) => {
-		setSubmitting(true)
-		setGuess(guess);
+	const submitGuess = async (newGuess) => {
+		setSubmitting(true);
+		setError('');
+		setGuess(newGuess);
 	}
 
 	useEffect(() => {
 		if (submitting) {
 			const submit = async () => {
-				const guessResponse = await (await fetch(`/api/guess?seed=${seed}&level=${level}&guess=${guess}`)).json();
-				
-				setData(d => [...d, guessResponse]);
-				setGuessCount(g => ++g);
-				setIsCorrect(guessResponse.reduce((isCorrect, letter) => isCorrect && letter.status === "correct", true));
+				const guessResponse = await (await fetch(
+					`/api/guess?seed=${seed}&level=${level}&guess=${guess}&previousGuess=${prevGuess}&mode=${modeName}`
+				)).json();
+
 				setSubmitting(false);
-				setGuess("");
+
+				if (guessResponse.error) {
+					setError(guessResponse.error);
+				} else {
+					const guessData = guessResponse.data;
+					setData(d => [...d, guessData]);
+					setGuessCount(g => ++g);
+					setIsCorrect(guessData.reduce((isCorrect, letter) => isCorrect && letter.status === "correct", true));
+					setPrevGuess(guess);
+					setGuess("");
+				}
 			}
 
 			void submit();
@@ -43,7 +62,7 @@ export default function Game({ seed, level }) {
 	}, [submitting]);
 
 	useEffect(() => {
-		if (timer > 0) {
+		if (timer && timer > 0) {
 			setTimeout(() => setTimer(t => --t), 1000);
 		}
 	}, [timer]);
@@ -68,9 +87,8 @@ export default function Game({ seed, level }) {
           Wordlee
         </h1>
 				<h2 className={styles.subtitle}>Seed: {seed} | Level: {level}</h2>
-				
 
-				{guessCount === 6 ? (
+				{(guessCount > 6 || (timer !== null && timer <= 0)) ? (
 					<div style={{ display: "flex", width: "50%", margin: "0 auto", flexDirection: "column", alignItems: "center" }}>
 						<p>Game over</p>
 						<h3>Final Score: {(level - 1)}</h3>
@@ -79,8 +97,9 @@ export default function Game({ seed, level }) {
 					</div>
 				) : (
 					<>
-						{/* <h3 className={styles.subtitle}>Timer: {timer}</h3> */}
+						{mode.timePerLevel && <h3 className={styles.subtitle}>Timer: {timer}</h3>}
 						<Board submitGuess={submitGuess} data={data} />
+						{error && <p style={{ display: "flex", width: "50%", margin: "0 auto", flexDirection: "column", alignItems: "center" }}>{error}</p>}
 						{isMobile && <div>
 							<input style={{ width: '100%' }} value="" placeholder="Tap here on mobile to bring up keyboard" />
 						</div>}
@@ -101,9 +120,7 @@ export default function Game({ seed, level }) {
 }
 
 export function getServerSideProps(context) {
-	const { req: { cookies }, query: { seed } } = context;
-
-	const level = cookies[seed.toLowerCase()] || "1";
+	const { req: { cookies }, query: { seed, mode: modeName } } = context;
 
 	if (!seed) {
 		return {
@@ -114,9 +131,12 @@ export function getServerSideProps(context) {
 		}
 	}
 
+	const level = cookies[seed.toLowerCase()] || "1";
+
 	return {
 		props: {
 			seed: seed.toLowerCase(),
+			modeName: modeName ? modeName.toLowerCase() : 'easy',
 			level,
 		}
 	}
