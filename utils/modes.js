@@ -48,7 +48,7 @@ export const CASUAL = {
 	name: MODE_NAME.CASUAL,
 	description: 'You have 6 guesses per level and there are no restrictions on your guesses.',
 	guessCount: 6,
-	guessValidator: () => true,
+	guessValidator: () => undefined,
 	timePerLevel: null,
 };
 

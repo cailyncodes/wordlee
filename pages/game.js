@@ -88,7 +88,7 @@ export default function Game({ seed, level, modeName }) {
         </h1>
 				<h2 className={styles.subtitle}>Seed: {seed} | Level: {level}</h2>
 
-				{(guessCount > 6 || (timer !== null && timer <= 0)) ? (
+				{((guessCount === 6 && !isCorrect) || (timer !== null && timer <= 0)) ? (
 					<div style={{ display: "flex", width: "50%", margin: "0 auto", flexDirection: "column", alignItems: "center" }}>
 						<p>Game over</p>
 						<h3>Final Score: {(level - 1)}</h3>
