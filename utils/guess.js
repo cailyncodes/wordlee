@@ -34,29 +34,6 @@ export const assessGuess = (currentWord, guess) => {
 		}
 	}
 
-
-	// let lettersInWordAfterRemovingCorrect = currentWord.split("");
-	// let numRemoved = 0;
-
-	// for (let i = 0; i < currentWord.length; ++i) {
-	// 	if (currentWord[i] === guess[i]) {
-	// 		statuses[i] = 'correct';
-	// 		lettersInWordAfterRemovingCorrect = lettersInWordAfterRemovingCorrect.filter((_,j) => i !== j + numRemoved);
-	// 		++numRemoved;
-	// 	}
-	// 	if (!currentWord.includes(guess[i])) {
-	// 		statuses[i] = 'not-used';
-	// 	}
-	// }
-
-	// for (let i = 0; i < currentWord.length; ++i) {
-	// 	if (statuses[i] === "pending") {
-	// 		if (lettersInWordAfterRemovingCorrect.includes(guess[i])) {
-	// 			statuses[i] = "wrong-position";
-	// 		}
-	// 	}
-	// }
-
 	return [
 		{ letter: guess[0], status: statuses[0] },
 		{ letter: guess[1], status: statuses[1] },

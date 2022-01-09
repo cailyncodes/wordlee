@@ -7,7 +7,7 @@ import { MODES, MODE_NAME } from "../../utils/modes.js";
 import { shuffle } from "../../utils/random.js";
 
 export default function handler(req, res) {
-	const file = fs.readFileSync(path.join(process.cwd(), "data", "valid-words.txt"));
+	const file = fs.readFileSync(path.join(process.cwd(), "data", "all_words.txt"));
 	const words = file.toString().split("\n");
 	
 	const { seed, level, guess, previousGuess, mode: modeName } = req.query;
