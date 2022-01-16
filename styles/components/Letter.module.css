@@ -1,0 +1,27 @@
+.container {
+	display: inline-flex;
+	padding: min(max(3vw, 0.5rem), 1.5rem);
+
+	background-color: #e8e8e8;
+	color: #343434;
+
+	-webkit-user-select: none;  
+  -moz-user-select: none;    
+  -ms-user-select: none;      
+  user-select: none;
+}
+
+.unused {
+	background-color: #343434;
+	color: #e8e8e8;
+}
+
+.action__enter {
+	margin-top: 1rem;
+	margin-right: 1rem;
+}
+
+.action__backspace {
+	margin-top: 1rem;
+	margin-left: 1rem;
+}

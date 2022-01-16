@@ -1,38 +1,22 @@
 import { ERROR_CODES } from "./errors";
-import { assessGuess, isValidWord } from "./guess";
+import { isValidWord } from "./guess";
+import { LETTER_MASK_MAP } from "./letter";
 
-const allRestrictions = (currentGuess, allWords, currentWord, prevGuess) => {
-	if (!isValidWord(allWords, currentGuess)) {
+const allRestrictions = (guess, allWords, currentWord, gameState) => {
+	if (!isValidWord(allWords, guess)) {
 		return ERROR_CODES.NOT_A_WORD;
 	}
 
-	const previousAssessment = assessGuess(currentWord, prevGuess);
+	const guessLetters = guess.split("");
 
-	let i = 0;
-	for (const letterStatus of previousAssessment) {
-		if (letterStatus.status === 'correct') {
-			if (currentGuess[i] !== currentWord[i]) {
-				return ERROR_CODES.IGNORES_RESTRICTIONS;
-			}
-		} else if (letterStatus.status === 'wrong-position') {
-			if (currentGuess[i] === letterStatus.letter) {
-				return ERROR_CODES.IGNORES_RESTRICTIONS;
-			}
-			if (!currentGuess.includes(letterStatus.letter)) {
-				return ERROR_CODES.IGNORES_RESTRICTIONS;
-			}
-
-			// TODO: Unhanded case about multiple wrong-position letters
-			// e.g. Correct word = CANAL | Prev guess = ALPHA | New guess = LANES
-			// New guess should have at least two As
-		} else if (letterStatus.status === 'not-used') {
-			if (currentGuess.includes(letterStatus.letter)) {
-				return ERROR_CODES.IGNORES_RESTRICTIONS;
-			}
-		} else /* pending */ {
-			// TODO
+	let index = 0;
+	for (const letter of guessLetters) {
+		const bitMask = LETTER_MASK_MAP[letter];
+		const isValid = (gameState[index] & bitMask) !== 0;
+		if (!isValid) {
+			return ERROR_CODES.IGNORES_RESTRICTIONS;
 		}
-		++i;
+		++index;
 	}
 }
 

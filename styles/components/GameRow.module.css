@@ -3,6 +3,6 @@
 	flex-direction: row;
 	justify-content: space-around;
 	align-content: center;
-	width: calc((35px * 6) + 10px);
+	width: calc((45px * 6) + 10px);
 	padding: 0.3rem 0.2rem;
 }

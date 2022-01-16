@@ -1,57 +1,56 @@
 import styles from '../styles/components/GameRow.module.css';
 import GameTile from './GameTile';
 import { useState, useEffect } from 'react';
-import { normalizeInputEvent } from '../utils/events';
 
 export default function ActiveGameRow({ submitGuess }) {
 	const [input, setInput] = useState('     ');
 	const [submitting, setSubmitting] = useState(false);
 
+	const handleInput = (key) => {
+		setInput((i) => {
+			if (key === "Enter") {
+				if (i.length === 5) {
+					setSubmitting(true);
+				}
+				return i;
+			}
+
+			const numOfLetters = i.trim().length;
+			if (numOfLetters > 0 && key === "Backspace") {
+				return `${i.substring(0, numOfLetters - 1)} ${i.substring(numOfLetters)}`;
+			}
+
+			if (numOfLetters >= 5 || key === "Backspace") {
+				return i;
+			}
+			
+			return `${i.substring(0, numOfLetters)}${key.toLocaleUpperCase()}${i.substring(numOfLetters + 1)}`;
+
+		});
+	}
+
 	useEffect(() => {
-		const listener = (e) => {
-			setInput(i => {
-				const numOfLetters = i.trim().length;
-
-				if (e.ignore) {
-					return i;
-				}
-
-				if (e.data) {
-					e.key = e.data.toUpperCase();
-					e.keyCode = e.key.charCodeAt(0);
-				}
-
-				if (!e.key) {
-					return i;
-				}
-
-				if (e.key === "Enter") {
-					if (i.length === 5) {
-						setSubmitting(true);
-					}
-					return i;
-				}
-
-				if (numOfLetters > 0 && e.key === "Backspace") {
-					return `${i.substring(0, numOfLetters - 1)} ${i.substring(numOfLetters)}`;
-				}
-
-				if (e.keyCode < 65 || e.keyCode > 90 || numOfLetters >= 5) {
-					return i;
-				}
-				
-				return `${i.substring(0, numOfLetters)}${e.key.toLocaleUpperCase()}${i.substring(numOfLetters + 1)}`;
-			})
+		const onscreenKeyboardListener = (e) => {
+			handleInput(e.detail.letter);
 		}
 
-		const l = e => listener(normalizeInputEvent(e));
+		const physicalKeyboardListener = (e) => {
+			const isValid = 
+				e.key === "Enter" ||
+				e.key === "Backspace" ||
+				(e.keyCode >= 65 && e.keyCode <= 90);
 
-		document.addEventListener('keyup', l);
-		document.addEventListener('input', l);
+			if (isValid) {
+				handleInput(e.key);
+			}
+		}
+
+		document.addEventListener('keyboard-event', onscreenKeyboardListener)
+		document.addEventListener('keyup', physicalKeyboardListener);
 
 		return () => {
-			document.removeEventListener("keyup", l);
-			document.removeEventListener('input', l);
+			document.removeEventListener('keyboard-event', onscreenKeyboardListener)
+			document.removeEventListener("keyup", physicalKeyboardListener);
 		}
 	}, []);
 

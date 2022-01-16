@@ -1,0 +1,9 @@
+import { ALL_POSSIBLE } from "./letter";
+
+export const DEFAULT_GAME_STATE = [
+	ALL_POSSIBLE,
+	ALL_POSSIBLE,
+	ALL_POSSIBLE,
+	ALL_POSSIBLE,
+	ALL_POSSIBLE
+]

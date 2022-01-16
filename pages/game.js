@@ -1,16 +1,17 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/pages/Game.module.css'
-import Board from '../components/Board';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
 import cookies from 'cookie-cutter';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import Board from '../components/Board';
+import Keyboard from '../components/Keyboard';
+import styles from '../styles/pages/Game.module.css';
+import { DEFAULT_GAME_STATE } from '../utils/game';
 import { MODES } from '../utils/modes';
 
 export default function Game({ seed, level, modeName }) {
 	const router = useRouter();
 	const [data, setData] = useState([]);
-	const [prevGuess, setPrevGuess] = useState("");
+	const [gameState, setGameState] = useState(DEFAULT_GAME_STATE);
 	const [guess, setGuess] = useState("");
 	const [submitting, setSubmitting] = useState(false);
 	const [isCorrect, setIsCorrect] = useState(false);
@@ -19,7 +20,6 @@ export default function Game({ seed, level, modeName }) {
 	const mode = MODES[modeName];
 	const [timer, setTimer] = useState(mode.timePerLevel);
 	const [error, setError] = useState('');
-	
 
 	useEffect(() => {
 		const userAgent = window.navigator.userAgent.toLowerCase();
@@ -39,20 +39,21 @@ export default function Game({ seed, level, modeName }) {
 	useEffect(() => {
 		if (submitting) {
 			const submit = async () => {
-				const guessResponse = await (await fetch(
-					`/api/guess?seed=${seed}&level=${level}&guess=${guess}&previousGuess=${prevGuess}&mode=${modeName}`
-				)).json();
-
+				const response = await fetch(
+					`/api/guess?seed=${seed}&level=${level}&guess=${guess}&gameState=${gameState}&mode=${modeName}`
+				);
+				const guessResponse = await response.json();
 				setSubmitting(false);
 
 				if (guessResponse.error) {
 					setError(guessResponse.error);
 				} else {
 					const guessData = guessResponse.data;
+					const newGameState = guessResponse.gameState;
 					setData(d => [...d, guessData]);
 					setGuessCount(g => ++g);
 					setIsCorrect(guessData.reduce((isCorrect, letter) => isCorrect && letter.status === "correct", true));
-					setPrevGuess(guess);
+					setGameState(newGameState);
 					setGuess("");
 				}
 			}
@@ -100,9 +101,6 @@ export default function Game({ seed, level, modeName }) {
 						{mode.timePerLevel && <h3 className={styles.subtitle}>Timer: {timer}</h3>}
 						<Board submitGuess={submitGuess} data={data} />
 						{error && <p style={{ display: "flex", width: "50%", margin: "0 auto", flexDirection: "column", alignItems: "center" }}>{error}</p>}
-						{isMobile && <div>
-							<input style={{ width: '100%' }} value="" placeholder="Tap here on mobile to bring up keyboard" />
-						</div>}
 						<div style={{ display: "flex", width: "50%", margin: "0 auto", flexDirection: "column", alignItems: "center" }}>
 							{isCorrect && <p>Woo! You did it! Way to go!</p>}
 							{isCorrect &&
@@ -112,6 +110,9 @@ export default function Game({ seed, level, modeName }) {
 								</> 
 							}
 						</div>
+						{isMobile && <div>
+							<Keyboard gameState={gameState} />
+						</div>}
 					</>
 				)}
       </main>
